@@ -90,19 +90,25 @@ def embed_music_and_captions(music, image_urls):
 def choose_song(prompt):
     response = co.chat(
     model="command",
-    message=f"Give me exactly and only 5 comma separated songs matching this user's prompt:\n{prompt}",
-    documents=SONGS)
-    response = co.generate(
-        model="command-xlarge-nightly",
-        prompt=prompt,
-        max_tokens=100,
-        temperature=0.8,
-        stop_sequences=["--"],
-        return_likelihoods="NONE",
-        truncate="START",
-    )
-    return response.generations[0].text
-print(choose(song('I feel like joyful 80s music')))
+    message=f"Give me exactly 5 songs and no extra info matching the chat history's format perfectly given this user's prompt:\n{prompt}",
+    chat_history=[
+        {"role": "User", "message": "I want uplifting 2000s music"},
+        {"role": "Chatbot", "message": "'Hey Ya!', 'Crazy', 'I Gotta Feeling', 'Umbrella', 'Viva la Vida'"},
+        {"role": "User", "message": "I want to hear some iconic 80s pop songs."},
+        {"role": "Chatbot", "message": "'Billie Jean', 'Like a Virgin', 'When Doves Cry', 'Sweet Dreams', 'Every Breath You Take'"},
+        {"role": "User", "message": "Can you suggest some classic country songs?"},
+        {"role": "Chatbot", "message": "'Jolene', 'Ring of Fire', 'Crazy', 'Take Me Home, Country Roads', 'Stand By Your Man'"},
+        {"role": "User", "message": "Looking for upbeat disco tracks."},
+        {"role": "Chatbot", "message": "'Stayin' Alive', 'Le Freak', 'Dancing Queen', 'Super Freak', 'I Will Survive'"}
+    ],
+    documents=SONGS,
+    temperature=0.0, 
+    prompt_truncation="OFF", 
+    stream=False,
+)
+
+    return response.text
+print(choose_song('I feel like joyful 80s music'))
 
 
 
