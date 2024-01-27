@@ -1,0 +1,4 @@
+https://stackoverflow.com/questions/714063/importing-modules-from-parent-folder
+https://stackoverflow.com/questions/62983756/what-is-pyproject-toml-file-for
+
+put the pyproject.toml file outside the root directory of the folder you wanna make a module of.
