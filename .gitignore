@@ -1,3 +1,4 @@
 model/generate_dance/DisCo
 model/generate_dance/pretrained-image-model
 model/generate_dance/sd-image-variations-diffusers
+*.mp3
