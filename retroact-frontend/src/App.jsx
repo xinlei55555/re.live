@@ -9,7 +9,7 @@ import logo from "./logo.png";
 import { FinalPage } from "./Components/FinalPage";
 export const PosnContext = createContext({}); // 0 is just a placeholder
 export const keyboardShownContext = createContext({}); // 0 is just a placeholder
-import Beat_It from "./Beat_It.mp3";
+// import Beat_It from "./Beat_It.mp3";
 
 const App = () => {
   const [posn, setPosn] = useState({
