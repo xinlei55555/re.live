@@ -13,7 +13,7 @@ def get_image_url(image_path):
 
     # Image to upload
     image = {
-        'image': open('testing_image.jpeg', 'rb').read()
+        'image': open(image_path, 'rb').read()
     }
 
     # POST request to Imgur API
@@ -23,4 +23,3 @@ def get_image_url(image_path):
     url = response.json()['data']['link']
 
     return url
-# print(get_image_url(TEST_PATH))
