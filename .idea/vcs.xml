@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/DisCo - copy" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/model/extract_dance/Moore_AnimateAnyone" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/model/generate_dance/DisCo" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/model/generate_dance/sd-image-variations-diffusers" vcs="Git" />
+  </component>
+</project>
