@@ -1,7 +1,15 @@
 .AnimatedTextBox {
-  background-color: azure;
-  width: 200px;
+  background-color: rgb(250, 240, 194);
+  padding: 40px;
+  box-shadow: 3px 4px 10px rgba(255, 254, 254, 0.8); /* Adjust values as needed */
+  border-radius: 20px;
+  max-width: 700px;
 }
 
 .text {
+  font-family: "Bungee Shade", sans-serif;
+  color: blue;
+  text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.8);
+  font-weight: 400;
+  font-size: 20px;
 }
