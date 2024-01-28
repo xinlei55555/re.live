@@ -9,6 +9,7 @@ import logo from "./logo.png";
 import { FinalPage } from "./Components/FinalPage";
 export const PosnContext = createContext({}); // 0 is just a placeholder
 export const keyboardShownContext = createContext({}); // 0 is just a placeholder
+import Beat_It from "./Beat_It.mp3";
 
 const App = () => {
   const [posn, setPosn] = useState({
@@ -31,8 +32,8 @@ const App = () => {
   const [isFinalStage, setIsFinalStage] = useState(false);
   const [emotion, setEmotion] = useState(null);
   useEffect(() => {
-    // var audio = new Audio(`Beat_It.mp3`);
-    // audio.play();
+    var audio = new Audio(Beat_It);
+    audio.play();
     // First animation
     const mover = setTimeout(() => {
       // Using the previous state to update the position
