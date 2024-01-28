@@ -1,0 +1,4 @@
+files:
+  test_img_path: /home/atif/Documents/Mediapipe_to_OpenPose_JSON/images/
+params:
+  write_json: true
