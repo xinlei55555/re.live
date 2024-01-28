@@ -4,17 +4,16 @@ import numpy as np
 import autofaiss
 from image_captioning import generate_caption
 from image_storing import get_image_url
+from cohere.responses.classify import Example
 
 api_key = os.environ.get("COHERE_API_KEY")
 co = cohere.Client(api_key)
 
-songs = [
-    {"title": "Alone", "snippet": "A powerful ballad with emotional depth."},
-    {"title": "Chain Reaction", "snippet": "Upbeat, vibrant, and catchy pop tune."},
-    {"title": "Relax", "snippet": "Energetic with provocative and electrifying vibes."},
-    {"title": "The Look of Love", "snippet": "Synthpop with heartfelt and introspective tones."},
-    {"title": "Here I Go Again", "snippet": "A mix of loneliness and determination."},
-    # ... additional songs from the 90s, 2000s, and 2010s will follow in a similar format ...
+EXAMPLES = [
+    Example("I want uplifting 2000s music!", "Energizing"),
+    Example("I want to hear some iconic 80s pop songs.", "Energizing"),
+    Example("Can you suggest mellow and slow songs?", "Soothing"),
+    Example("Looking for melancholy disco tracks.", "Soothing")
 ]
 
 
@@ -72,10 +71,12 @@ SONGS = [
     ]
 
 
-def embed_music_and_captions(music, image_urls):
+def embed_music_and_captions(music):
     # index 1 will be music, others wil be captions
     # captions will be a list of dictionaries, one per image
-
+    k = 100
+    image_paths = [f'image{i}.jpg' for i in range(1, 4)]
+    image_urls = [get_image_url(image_path) for image_path in image_paths]
     captions = [generate_caption(image) for image in image_urls]
 
     combined_captions = [f'{caption_dict["text"]}\n{", ".join(caption_dict["tags"])}' for caption_dict in captions]
@@ -83,14 +84,24 @@ def embed_music_and_captions(music, image_urls):
     embeddings = np.array(co.embed(combined_music_and_captions).embeddings)
 
     index, stats = autofaiss.build_index(embeddings[1:])
-    dist, idx = index.search(np.array([embeddings[0]]), k=2)
-    return [image_urls[i] for i in idx[0]]
+    if len(image_urls) > k:
+        dist, idx = index.search(np.array([embeddings[0]]), k=k)
+        selected_captions = [captions[i] for i in idx[0]]
+        results = co.rerank(query=f"Give the image captions that match {music}", documents=selected_captions, top_n=2, model="rerank-multilingual-v2.0")
+        return [image_urls[hit.index] for hit in results]
+    else:
+        dist, idx = index.search(np.array([embeddings[0]]), k=2)
+        return [image_urls[i] for i in idx[0]]
 
-
-def choose_song(prompt):
+def choose_songs(prompt, sentiment):
+    song_descriptions = [song['snippet'] for song in SONGS]
+    classifications = co.classify(inputs=song_descriptions, examples=EXAMPLES)
+    filtered_songs = [SONGS[i] for i in range(len(song_descriptions)) if classifications[i].prediction == sentiment]
+    print(filtered_songs)
+    
     response = co.chat(
     model="command",
-    message=f"Give me exactly 5 songs and no extra info matching the chat history's format perfectly given this user's prompt:\n{prompt}",
+    message=f"Give me 5 comma separated songs and nothing else matching the chat history's format perfectly given this user's prompt:\n{prompt}",
     chat_history=[
         {"role": "User", "message": "I want uplifting 2000s music"},
         {"role": "Chatbot", "message": "'Hey Ya!', 'Crazy', 'I Gotta Feeling', 'Umbrella', 'Viva la Vida'"},
@@ -101,14 +112,57 @@ def choose_song(prompt):
         {"role": "User", "message": "Looking for upbeat disco tracks."},
         {"role": "Chatbot", "message": "'Stayin' Alive', 'Le Freak', 'Dancing Queen', 'Super Freak', 'I Will Survive'"}
     ],
-    documents=SONGS,
+    documents=filtered_songs,
+    temperature=0.0, 
+    prompt_truncation="OFF", 
+    stream=False,
+    )
+
+    return response.text.split(', ')
+# print(choose_song('I feel like joyful 80s music'))
+
+song_to_vid_map = {'Hey Ya!': ['vid1.mp4', 'vid2.mp4']}
+def choose_dances(song):
+    return jsonify({'response': 'res'})
+    return jsonify(song_to_vid_map[song])
+
+def reply(prompt, context):
+    #context format {'song':, 'chosen_image_captions':, 'initial_prompt':}
+    captions = '\n'.join([f'''Image{i+1} text:{captions[i]["text"]} Image{i} tags:{", ".join(captions[i]["tags"])}''' for i in range(len(captions))])
+    response = co.chat(
+    model="command",
+    message=f"""Respond to the user's prompt {prompt} based on their initial prompt {context['initial_prompt']}, \
+        the matched song {context['song']} and their past images which matched the song {captions}""",
+    chat_history=[
+        {"role": "User", "message": "I want uplifting 2000s music"},
+        {"role": "Chatbot", "message": "'Hey Ya!', 'Crazy', 'I Gotta Feeling', 'Umbrella', 'Viva la Vida'"},
+        {"role": "User", "message": "I want to hear some iconic 80s pop songs."},
+        {"role": "Chatbot", "message": "'Billie Jean', 'Like a Virgin', 'When Doves Cry', 'Sweet Dreams', 'Every Breath You Take'"},
+        {"role": "User", "message": "Can you suggest mellow country songs?"},
+        {"role": "Chatbot", "message": "'Jolene', 'Ring of Fire', 'Crazy', 'Take Me Home, Country Roads', 'Stand By Your Man'"},
+        {"role": "User", "message": "Looking for melancholy disco tracks."},
+        {"role": "Chatbot", "message": "'Stayin' Alive', 'Le Freak', 'Dancing Queen', 'Super Freak', 'I Will Survive'"}
+    ],
     temperature=0.0, 
     prompt_truncation="OFF", 
     stream=False,
 )
 
-    return response.text
-print(choose_song('I feel like joyful 80s music'))
+
+
+def classify_user_prompt(prompt):
+ 
+
+    response = co.classify(
+        inputs=[prompt],
+        examples=EXAMPLES,
+    )
+    return response[0].prediction
+
+
+
+
+
 
 
 
