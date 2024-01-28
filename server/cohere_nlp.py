@@ -87,17 +87,17 @@ def embed_music_and_captions(music):
     if len(image_urls) > k:
         dist, idx = index.search(np.array([embeddings[0]]), k=k)
         selected_captions = [captions[i] for i in idx[0]]
-        results = co.rerank(query=f"Give the image captions that match {music}", documents=selected_captions, top_n=2, model="rerank-multilingual-v2.0")
+        results = co.rerank(query=f"Give the image captions that match {music}", documents=selected_captions, top_n=6, model="rerank-multilingual-v2.0")
         return [image_urls[hit.index] for hit in results]
     else:
-        dist, idx = index.search(np.array([embeddings[0]]), k=2)
+        dist, idx = index.search(np.array([embeddings[0]]), k=6)
         return [image_urls[i] for i in idx[0]]
 
 def choose_songs(prompt, sentiment):
     song_descriptions = [song['snippet'] for song in SONGS]
     classifications = co.classify(inputs=song_descriptions, examples=EXAMPLES)
     filtered_songs = [SONGS[i] for i in range(len(song_descriptions)) if classifications[i].prediction == sentiment]
-    print(filtered_songs)
+
     
     response = co.chat(
     model="command",
@@ -118,13 +118,11 @@ def choose_songs(prompt, sentiment):
     stream=False,
     )
 
-    return response.text.split(', ')
+    cleaned = response.text.split(', ')
+    if len(cleaned) != 5:
+        return ['Hey Ya!', 'Crazy', 'I Gotta Feeling', 'Umbrella', 'Viva la Vida']
 # print(choose_song('I feel like joyful 80s music'))
 
-song_to_vid_map = {'Hey Ya!': ['vid1.mp4', 'vid2.mp4']}
-def choose_dances(song):
-    return jsonify({'response': 'res'})
-    return jsonify(song_to_vid_map[song])
 
 def reply(prompt, context):
     #context format {'song':, 'chosen_image_captions':, 'initial_prompt':}

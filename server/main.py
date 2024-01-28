@@ -1,6 +1,6 @@
 from flask_cors import CORS, cross_origin
 from flask import Flask, flash, redirect, request, session, url_for, jsonify
-from cohere_nlp import choose_songs, embed_music_and_captions, choose_dances, reply, classify_user_prompt
+from cohere_nlp import choose_songs, embed_music_and_captions, reply, classify_user_prompt
 
 
 app = Flask(__name__)
@@ -12,16 +12,12 @@ def entry():
     sentiment = classify_user_prompt(prompt)
     songs = choose_songs(prompt, sentiment)
     return jsonify(
-        {'songs': songs}
+        {
+            'songs': songs,
+            'sentiment': sentiment
+            }
     )
 
-@app.route('/dance/', methods=['POST'])
-def dance():
-    song = request.get_json()['song']
-    dances = choose_dances(song)
-    return jsonify(
-        {'dance': dances}
-    )
 
 
 @app.route('/images/', methods=['POST'])
