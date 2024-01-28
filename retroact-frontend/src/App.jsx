@@ -31,6 +31,8 @@ const App = () => {
   const [isFinalStage, setIsFinalStage] = useState(false);
   const [emotion, setEmotion] = useState(null);
   useEffect(() => {
+    // var audio = new Audio(`Beat_It.mp3`);
+    // audio.play();
     // First animation
     const mover = setTimeout(() => {
       // Using the previous state to update the position
@@ -55,6 +57,11 @@ const App = () => {
   const finalCall = () => {
     setTimeout(() => {
       setIsFinalStage(true);
+      setPosn({
+        ...posn,
+        ghostX: posn.ghostX + 100,
+        // ghostY: posn.ghostY - 150,
+      });
     }, 1000);
 
     // Send API Calls:
@@ -140,19 +147,20 @@ const App = () => {
       setCarouselContent([
         {
           image: img,
-          title: "Hello!",
+          title: "Beat_It",
         },
         {
           image: img,
-          title: "Hello!",
+          title: "Rehab",
+        },
+
+        {
+          image: img,
+          title: "Someone_Like_You",
         },
         {
           image: img,
-          title: "Hello!",
-        },
-        {
-          image: img,
-          title: "Hello!",
+          title: "Smells_Like_Teen_Spirit",
         },
       ]);
       setShowMusicCarousel(true);
@@ -161,7 +169,7 @@ const App = () => {
 
   return (
     <PosnContext.Provider value={[posn, setPosn]}>
-      <div className="App">
+      <div className={isFinalStage ? "final-stage-bg App" : "App"}>
         <header className="App-header">
           <img src={logo} alt="Logo" className="App-logo" />{" "}
           <span
@@ -175,6 +183,10 @@ const App = () => {
           >
             ReLive
           </span>
+          <img
+            src={disco}
+            style={{ height: 220, position: "absolute", top: 0, right: 80 }}
+          />
         </header>
         <Ghost textContent={textContent} />
         {showMusicCarousel ? (
