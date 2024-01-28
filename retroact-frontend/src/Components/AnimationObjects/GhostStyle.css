@@ -1,8 +1,5 @@
 .blob {
-  width: 500px;
-  height: 500px;
-  border-width: 20px;
-  border: solid 20px white;
   display: flex;
   flex-direction: row;
+  align-items: center;
 }

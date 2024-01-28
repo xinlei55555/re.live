@@ -8,8 +8,8 @@ import { PosnContext } from "../../App";
 import { motion } from "framer-motion";
 
 import { AnimatedTextBox } from "./AnimatedTextBox";
-
-export default function Ghost() {
+import "./GhostStyle.css";
+export default function Ghost({ textContent }) {
   const [posn, setPosn] = useContext(PosnContext);
   console.log(posn);
   // const [x, y] = useMemo(() => [Math.random() * 100, Math.random() * 100], []);
@@ -18,11 +18,11 @@ export default function Ghost() {
     <motion.div
       className="blob"
       animate={{
-        x: posn.x,
-        y: posn.y,
+        x: posn.ghostX,
+        y: posn.ghostY,
       }}
       transition={{
-        duration: 3,
+        duration: 2,
       }}
     >
       <motion.svg
@@ -39,6 +39,7 @@ export default function Ghost() {
         </defs>
         <motion.path
           animate={{ scale: [0.9, 1, 0.9] }}
+          style={{ scale: 0 }}
           transition={{
             time: [0, 1],
             duration: 3,
@@ -57,7 +58,7 @@ export default function Ghost() {
           ></motion.animate> */}
         </motion.path>
       </motion.svg>
-      <AnimatedTextBox textContent={"Hello!"} />
+      <AnimatedTextBox textContent={textContent} />
     </motion.div>
   );
 }
